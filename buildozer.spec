@@ -12,7 +12,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
 # Kivy sürümü + python (2026'da stabil olan)
-requirements = python3,kivy==2.3.0
+requirements = python3,kivy==2.2.1,buildozer,cython==0.29.37
 
 # Telefonu dik tutsun
 orientation = portrait
@@ -30,3 +30,7 @@ android.ndk = 25b
 
 # İkon eklemek istersen sonra buraya yazarsın (şimdilik boş bırak)
 #icon.filename = icon.png
+
+p4a.branch = master
+android.api = 33
+android.minapi = 21

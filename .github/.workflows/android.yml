@@ -1,45 +1,26 @@
-name: Build Android APK
+name: Casus Oyunu APK Oluştur
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch:   # Bu sayede elle de başlatabilirsin
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - name: Kodu çek
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+    - name: APK'yı Buildozer ile derle
+      uses: ArtemSBulgakov/buildozer-action@v1
+      id: buildozer
+      with:
+        command: buildozer -v android debug
 
-      - name: Install dependencies
-        run: |
-          pip install buildozer cython
-          sudo apt update
-          sudo apt install -y openjdk-17-jdk zip unzip
-
-      - name: Initialize buildozer
-        run: buildozer init
-
-      - name: Patch buildozer.spec
-        run: |
-          sed -i 's/^title = .*/title = Casus Oyunu/' buildozer.spec
-          sed -i 's/^package.name = .*/package.name = casusoyunu/' buildozer.spec
-          sed -i 's/^package.domain = .*/package.domain = org.hayati/' buildozer.spec
-          sed -i 's/^requirements = .*/requirements = python3,kivy/' buildozer.spec
-          sed -i 's/^orientation = .*/orientation = portrait/' buildozer.spec
-          sed -i 's/^fullscreen = .*/fullscreen = 1/' buildozer.spec
-
-      - name: Build APK
-        run: buildozer -v android debug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk
-          path: bin/*.apk
+    - name: Oluşan APK'yı sakla (indirmek için)
+      uses: actions/upload-artifact@v4
+      with:
+        name: casus-apk
+        path: bin/*.apk

@@ -1,4 +1,4 @@
-name: Casus Oyunu APK Derle (Docker Action)
+name: Casus Oyunu APK Derle (SHA Pinli)
 
 on:
   workflow_dispatch:
@@ -11,19 +11,19 @@ jobs:
 
     steps:
       - name: Repo'yu çek
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332  # v4'ün güncel SHA'sı
 
       - name: Buildozer ile APK derle
-        uses: ArtemSBulgakov/buildozer-action@v1
+        uses: ArtemSBulgakov/buildozer-action@3808a27e5d64e3921ed1735dacc214aeaec38080  # En son stabil commit
         id: buildozer
         with:
           command: buildozer -v android debug
-          workdir: .   # buildozer.spec kök dizinde olduğu için .
-          buildozer_version: stable  # veya master için en güncel
+          workdir: .
+          buildozer_version: stable
 
-      - name: APK'yı sakla (Artifacts)
+      - name: APK'yı sakla
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v4'ün bir SHA'sı (güvenli)
         with:
           name: casus-oyunu-apk
           path: ${{ steps.buildozer.outputs.filename }}

@@ -1,36 +1,29 @@
-name: Casus Oyunu APK Derle
+name: Casus Oyunu APK Derle (Docker Action)
 
 on:
-  workflow_dispatch:   # Elle başlat (push'ta otomatik olmasın diye)
+  workflow_dispatch:
   push:
     branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Repo'yu çek
         uses: actions/checkout@v4
 
-      - name: Gerekli paketleri kur (Java, pip vs.)
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y openjdk-17-jdk python3-pip git unzip zip libffi-dev libssl-dev
+      - name: Buildozer ile APK derle
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          command: buildozer -v android debug
+          workdir: .   # buildozer.spec kök dizinde olduğu için .
+          buildozer_version: stable  # veya master için en güncel
 
-      - name: Buildozer'ı kur (stabil versiyon)
-        run: |
-          python3 -m pip install --user --upgrade pip
-          python3 -m pip install --user cython==0.29.37 buildozer==1.5.0
-
-      - name: APK'yı derle
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          buildozer android debug --log-level 2
-
-      - name: APK'yı artifact olarak yükle (indirmek için)
+      - name: APK'yı sakla (Artifacts)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: casus-apk
-          path: bin/*.apk
+          name: casus-oyunu-apk
+          path: ${{ steps.buildozer.outputs.filename }}

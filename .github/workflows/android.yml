@@ -1,29 +1,36 @@
-name: Casus Oyunu APK Oluştur
+name: Casus Oyunu APK Derle (Stabil Versiyon)
 
 on:
+  workflow_dispatch:  # Sadece elle başlat (push'ta otomatik olmasın, baş ağrısı yapmasın)
   push:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Daha stabil OS
 
     steps:
-    - name: Kodu çek
+    - name: Kodu repo'dan çek
       uses: actions/checkout@v4
 
-    - name: APK'yı Buildozer ile derle
-      uses: ArtemSBulgakov/buildozer-action@v1
-      id: buildozer
-      with:
-        workdir: .          # ← Bu önemli! buildozer.spec'in olduğu kök dizini belirt
-        command: buildozer -v android debug
-        buildozer_version: master  # En güncel versiyonu kullan
+    - name: Java ve diğer bağımlılıkları kur
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-17-jdk python3-pip git zip unzip
 
-    - name: Oluşan APK'yı sakla
-      if: success()     # Sadece başarılı olursa artifact yükle
+    - name: Buildozer ve gereksinimleri kur
+      run: |
+        pip3 install --user cython==0.29.37 buildozer==1.5.0
+
+    - name: Buildozer ile APK derle
+      run: |
+        export PATH=$HOME/.local/bin:$PATH
+        buildozer android debug --log-level 2
+
+    - name: APK'yı artifact olarak sakla
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: casus-apk
+        name: casus-oyunu-apk
         path: bin/*.apk
+        if-no-files-found: warn  # Hata olsa bile artifact oluştur

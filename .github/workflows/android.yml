@@ -3,7 +3,7 @@ name: Casus Oyunu APK Oluştur
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:   # Bu sayede elle de başlatabilirsin
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,9 +17,12 @@ jobs:
       uses: ArtemSBulgakov/buildozer-action@v1
       id: buildozer
       with:
+        workdir: .          # ← Bu önemli! buildozer.spec'in olduğu kök dizini belirt
         command: buildozer -v android debug
+        buildozer_version: master  # En güncel versiyonu kullan
 
-    - name: Oluşan APK'yı sakla (indirmek için)
+    - name: Oluşan APK'yı sakla
+      if: success()     # Sadece başarılı olursa artifact yükle
       uses: actions/upload-artifact@v4
       with:
         name: casus-apk
